@@ -12,7 +12,7 @@ public:
 
 public slots:
     void ring();
-    void move(const int to_Floor);
+    void move( const int to_Floor);
     void open_cab();
     void close_cab();
 

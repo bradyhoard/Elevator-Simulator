@@ -19,7 +19,7 @@
      <rect>
       <x>5</x>
       <y>20</y>
-      <width>261</width>
+      <width>481</width>
       <height>361</height>
      </rect>
     </property>
@@ -27,8 +27,8 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>0</y>
+      <x>560</x>
+      <y>10</y>
       <width>221</width>
       <height>101</height>
      </rect>
@@ -105,8 +105,8 @@
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>130</y>
+      <x>580</x>
+      <y>140</y>
       <width>171</width>
       <height>111</height>
      </rect>
@@ -154,8 +154,8 @@
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>120</y>
+      <x>580</x>
+      <y>280</y>
       <width>171</width>
       <height>151</height>
      </rect>
@@ -209,7 +209,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_3">
+    <widget class="QPushButton" name="Help">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -222,7 +222,7 @@
       <string>Help</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_4">
+    <widget class="QPushButton" name="GoButton">
      <property name="geometry">
       <rect>
        <x>80</x>
@@ -232,9 +232,22 @@
       </rect>
      </property>
      <property name="text">
-      <string>Clicked</string>
+      <string>Go</string>
      </property>
     </widget>
+   </widget>
+   <widget class="QPushButton" name="initiateButton">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>390</y>
+      <width>491</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Initiate</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

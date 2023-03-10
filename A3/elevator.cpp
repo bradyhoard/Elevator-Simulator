@@ -1,6 +1,6 @@
 #include "elevator.h"
 #include <QDebug>
-#include <QThread>
+#include <QTimer>
 
 Elevator::Elevator(QTextBrowser *browser, bool idle,int floor, int elevator_id , QObject *parent) : QObject(parent)
 {
@@ -17,21 +17,17 @@ void Elevator::ring()
 
 void Elevator::move(const int to_Floor)
 {
- QThread::sleep(5);
-    m_browser->append("Elevator currently at floor - ");
-    m_browser->insertPlainText(QString::number(m_floor));
-
-    m_browser->append("Elevator going to floor - ");
-    m_browser->insertPlainText(QString::number(to_Floor));
-
+    m_browser->append("Elevator " + QString::number(m_elevator_id) + " - ");
+    m_browser->insertPlainText("At floor - " + QString::number(m_floor) + " || To floor - " + QString::number(to_Floor));
 
     for(int i=m_floor +1;i<=to_Floor;i++)
     {
-        QThread::sleep(2);
-        m_browser->append("Moving to - ");
-        m_browser->insertPlainText(QString::number(i));
-        m_floor = i;
 
+        QTimer::singleShot(2000, [=]() {
+            m_browser->append("Moving to - ");
+            m_browser->insertPlainText(QString::number(i));
+            m_floor = i;
+        });
     }
 
 /*
