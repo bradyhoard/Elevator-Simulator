@@ -28,27 +28,19 @@ MainWindow::MainWindow(QWidget *parent)
     Floor* floor2 = new Floor(ui->textBrowser, 2, this);
     Floor* floor3 = new Floor(ui->textBrowser, 3, this);
     Floor* floor4 = new Floor(ui->textBrowser, 4, this);
-    Floor* floor5 = new Floor(ui->textBrowser, 5, this);
-    Floor* floor6 = new Floor(ui->textBrowser, 6, this);
     floors->push_back(floor0);
     floors->push_back(floor1);
     floors->push_back(floor2);
     floors->push_back(floor3);
     floors->push_back(floor4);
-    floors->push_back(floor5);
-    floors->push_back(floor6);
 
 
 
     //all the elevators added to the ECS
     Elevator* elevator1 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 1, this);
     Elevator* elevator2 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 2, this);
-    Elevator* elevator3 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 3, this);
-    Elevator* elevator4 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 4, this);
     elevators->push_back(elevator1);
     elevators->push_back(elevator2);
-    elevators->push_back(elevator3);
-    elevators->push_back(elevator4);
 
     ECS* ecs = new ECS(ui->textBrowser, elevators, *floors, this);
 
@@ -123,14 +115,14 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::initiate()
 {
     //add the floors numbers to the combo box
-    QList<int> floors = {0,1, 2, 3,4,5,6};
+    QList<int> floors = {0,1, 2, 3,4};
     for (int i = 0; i < floors.count(); ++i) {
         ui->floorComboBox->addItem(QString::number(floors[i]));
         ui->carFloorComboBox->addItem(QString::number(floors[i]));
     }
 
     //add the floors numbers to the combo box
-    QList<int> elevators = {1, 2, 3,4};
+    QList<int> elevators = {1, 2};
     for (int i = 0; i < elevators.count(); ++i) {
         ui->carComboBox->addItem(QString::number(elevators[i]));
 
