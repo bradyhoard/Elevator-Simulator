@@ -1,5 +1,4 @@
 #include "floor.h"
-#include <QDebug>
 
 Floor::Floor(QTextBrowser *browser, int floor_number, QObject *parent) : QObject(parent)
 {
@@ -9,10 +8,10 @@ Floor::Floor(QTextBrowser *browser, int floor_number, QObject *parent) : QObject
 
 void Floor::open_Door()
 {
-    m_browser->append("Door opening...");
+    m_browser->append("Floor" + QString::number(m_floor_number) + ":  doors opening...");
 }
 
 void Floor::close_Door()
 {
-    m_browser->append("Door closing...");
+    m_browser->append("Floor" + QString::number(m_floor_number) + ":  doors clsoing...");
 }

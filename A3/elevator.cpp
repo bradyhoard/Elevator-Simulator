@@ -1,32 +1,45 @@
 #include "elevator.h"
 #include "floor.h"
+#include <QTimer>
+#include <QEventLoop>
 
-Elevator::Elevator(QTextBrowser *browser, bool idle,int floor_number,int passengers, int elevator_id , QList<Floor*> floors, QObject *parent) : QObject(parent)
+Elevator::Elevator(QTextBrowser *browser, bool idle, QString direction, int floor_number,int passengers, int elevator_id , QObject *parent) : QObject(parent)
 {
     m_browser = browser;
     m_idle = idle;
+    m_direction = direction;
     m_floor_number = floor_number;
     m_elevator_id = elevator_id;
     m_passengers = passengers;
-    m_floors = floors;
+
 }
 
 void Elevator::status()
 {
     m_browser->append("_____________");
     m_browser->append("Elevator: " + QString::number(m_elevator_id));
-    m_browser->append("_____________");
     m_browser->append("At floor: " + QString::number(m_floor_number));
     m_browser->append(QString("Idle: %1").arg(m_idle ? "true" : "false"));
+    m_browser->append("Direction: " + m_direction);
     m_browser->append("# of passengers: " + QString::number(m_passengers));
     m_browser->append("_____________");
 
 }
 
-void Elevator::ring()
+bool Elevator::ring()
 {
+    m_direction = "Stopped";
+    m_idle = true;
     m_browser->append("Elevator ringing! We have reached the Floor");
-    open_cab();
+    return true;
+    QTimer *timer = new QTimer(this);
+        timer->setInterval(1000);
+        QObject::connect(timer, &QTimer::timeout, [=]() {
+            timer->stop();
+            timer->deleteLater();
+            open_cab();
+        });
+        timer->start();
 }
 
 void Elevator::move(const int to_Floor)
@@ -34,14 +47,64 @@ void Elevator::move(const int to_Floor)
     m_browser->append("Elevator: " + QString::number(m_elevator_id) + " - ");
     m_browser->insertPlainText("At floor: " + QString::number(m_floor_number) + " || To floor: " + QString::number(to_Floor));
 
-    for(int i=m_floor_number +1;i<=to_Floor;i++)
-    {
-        m_browser->append("Moving to: ");
-        m_browser->insertPlainText(QString::number(i));
-        m_floor_number = i;
-
+    if (m_floor_number < to_Floor){
+        m_direction = "Up";
+        m_idle = false;
+        QTimer *timer = new QTimer(this);
+            timer->setInterval(1000);
+            QObject::connect(timer, &QTimer::timeout, [=]() {
+                m_browser->append("Moving up to: ");
+                m_browser->insertPlainText(QString::number(m_floor_number));
+                m_floor_number++;
+                if (m_floor_number > to_Floor) {
+                    m_floor_number--;
+                    timer->stop();
+                    timer->deleteLater();
+                    ring();
+                }
+            });
+            for(int i = m_floor_number + 1; i <= to_Floor; i++)
+            {
+                m_floor_number = i;
+                timer->start();
+                QEventLoop loop;
+                QObject::connect(timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+                loop.exec();
+            }
     }
-    ring();
+    else if (m_floor_number > to_Floor){
+        m_direction = "Down";
+        m_idle = false;
+        QTimer *timer = new QTimer(this);
+            timer->setInterval(1000);
+            QObject::connect(timer, &QTimer::timeout, [=]() {
+                m_browser->append("Moving down to: ");
+                m_browser->insertPlainText(QString::number(m_floor_number));
+                m_floor_number--;
+                if (m_floor_number < to_Floor) {
+                    m_floor_number++;
+                    timer->stop();
+                    timer->deleteLater();
+                    ring();
+                }
+            });
+            for(int i = m_floor_number - 1; i >= to_Floor; i--)
+            {
+                m_floor_number = i;
+                timer->start();
+                QEventLoop loop;
+                QObject::connect(timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+                loop.exec();
+            }
+
+        }
+
+    else{
+         m_browser->append("Currently at the request Floor");
+         ring();
+    }
+
+
 
 /*
     //current floor of the elevator and change to the new floor

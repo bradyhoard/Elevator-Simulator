@@ -41,16 +41,16 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     //all the elevators added to the ECS
-    Elevator* elevator1 = new Elevator(ui->textBrowser, true , 0 ,0, 1, *floors, this);
-    Elevator* elevator2 = new Elevator(ui->textBrowser, true , 0 ,0, 2,*floors, this);
-    Elevator* elevator3 = new Elevator(ui->textBrowser, true , 0 ,0, 3, *floors, this);
-    Elevator* elevator4 = new Elevator(ui->textBrowser, true , 0 ,0, 4, *floors,this);
+    Elevator* elevator1 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 1, this);
+    Elevator* elevator2 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 2, this);
+    Elevator* elevator3 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 3, this);
+    Elevator* elevator4 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 4, this);
     elevators->push_back(elevator1);
     elevators->push_back(elevator2);
     elevators->push_back(elevator3);
     elevators->push_back(elevator4);
 
-    ECS* ecs = new ECS(ui->textBrowser, elevators, this);
+    ECS* ecs = new ECS(ui->textBrowser, elevators, *floors, this);
 
     //disable all buttons until initaite is called
     ui->PowerOutageButton->setEnabled(false);
@@ -65,6 +65,16 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     connect(ui->initiateButton, &QPushButton::clicked, this, &MainWindow::initiate);
+
+    connect(ui->floorUp, &QPushButton::clicked, this, [=]() {
+            int floor_number = ui->floorComboBox->currentText().toInt();
+            ecs->find_elevator(floor_number , "Up");
+        });
+
+    connect(ui->floorDown, &QPushButton::clicked, this, [=]() {
+            int floor_number = ui->floorComboBox->currentText().toInt();
+            ecs->find_elevator(floor_number , "Down");
+        });
 
 
 
