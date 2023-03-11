@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     Button* abutton = new Button(ui->textBrowser, this);
     QList<Elevator*> *elevators = new QList<Elevator*>();
+    QList<Floor*> *floors = new QList<Floor*>();
 
     /*
     for (int i = 1; i < 5; ++i) {
@@ -20,10 +21,30 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     */
-    Elevator* elevator1 = new Elevator(ui->textBrowser, false , 0 , 1001, this);
-    Elevator* elevator2 = new Elevator(ui->textBrowser, false , 0 , 1002, this);
-    Elevator* elevator3 = new Elevator(ui->textBrowser, false , 0 , 1003, this);
-    Elevator* elevator4 = new Elevator(ui->textBrowser, false , 0 , 1004, this);
+
+    //all the floors added to the
+    Floor* floor0 = new Floor(ui->textBrowser, 0, this);
+    Floor* floor1 = new Floor(ui->textBrowser, 1, this);
+    Floor* floor2 = new Floor(ui->textBrowser, 2, this);
+    Floor* floor3 = new Floor(ui->textBrowser, 3, this);
+    Floor* floor4 = new Floor(ui->textBrowser, 4, this);
+    Floor* floor5 = new Floor(ui->textBrowser, 5, this);
+    Floor* floor6 = new Floor(ui->textBrowser, 6, this);
+    floors->push_back(floor0);
+    floors->push_back(floor1);
+    floors->push_back(floor2);
+    floors->push_back(floor3);
+    floors->push_back(floor4);
+    floors->push_back(floor5);
+    floors->push_back(floor6);
+
+
+
+    //all the elevators added to the ECS
+    Elevator* elevator1 = new Elevator(ui->textBrowser, true , 0 ,0, 1, *floors, this);
+    Elevator* elevator2 = new Elevator(ui->textBrowser, true , 0 ,0, 2,*floors, this);
+    Elevator* elevator3 = new Elevator(ui->textBrowser, true , 0 ,0, 3, *floors, this);
+    Elevator* elevator4 = new Elevator(ui->textBrowser, true , 0 ,0, 4, *floors,this);
     elevators->push_back(elevator1);
     elevators->push_back(elevator2);
     elevators->push_back(elevator3);
@@ -40,12 +61,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->GoButton->setEnabled(false);
     ui->floorUp->setEnabled(false);
     ui->floorDown->setEnabled(false);
+    ui->ElevatorStatusButton->setEnabled(false);
 
 
     connect(ui->initiateButton, &QPushButton::clicked, this, &MainWindow::initiate);
 
-
-    //elevator1->move(2);
 
 
     connect(ui->GoButton, &QPushButton::clicked, this, [=]() {
@@ -53,6 +73,12 @@ MainWindow::MainWindow(QWidget *parent)
             int floor = ui->carFloorComboBox->currentText().toInt();
             Elevator *elevator = elevators->at(car);
             elevator->move(floor);
+        });
+
+    connect(ui->ElevatorStatusButton, &QPushButton::clicked, this, [=]() {
+            int car = ui->carComboBox->currentText().toInt() -1;
+            Elevator *elevator = elevators->at(car);
+            elevator->status();
         });
 
 
@@ -111,6 +137,7 @@ void MainWindow::initiate()
     ui->GoButton->setEnabled(true);
     ui->floorUp->setEnabled(true);
     ui->floorDown->setEnabled(true);
+    ui->ElevatorStatusButton->setEnabled(true);
 
 }
 

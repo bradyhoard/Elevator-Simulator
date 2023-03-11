@@ -1,9 +1,10 @@
 #include "floor.h"
 #include <QDebug>
 
-Floor::Floor(QTextBrowser *browser, QObject *parent) : QObject(parent)
+Floor::Floor(QTextBrowser *browser, int floor_number, QObject *parent) : QObject(parent)
 {
     m_browser = browser;
+    m_floor_number = floor_number;
 }
 
 void Floor::open_Door()
