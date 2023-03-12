@@ -209,12 +209,12 @@
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="Help">
+    <widget class="QPushButton" name="HelpButton">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>120</y>
-       <width>61</width>
+       <width>81</width>
        <height>25</height>
       </rect>
      </property>
@@ -225,7 +225,7 @@
     <widget class="QPushButton" name="GoButton">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>100</x>
        <y>120</y>
        <width>80</width>
        <height>25</height>

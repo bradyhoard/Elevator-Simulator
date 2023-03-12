@@ -11,10 +11,42 @@ ECS::ECS(QTextBrowser *browser, QList<Elevator*> *elevators, QList<Floor*> floor
 
 }
 
+void ECS::help(const int index)
+{
+    m_browser->append("Received help signal from elevator:   " + QString::number(index));
+
+    QTimer* timer = new QTimer(this);
+
+    timer->setInterval(1000);
+
+    connect(timer, &QTimer::timeout, this, [=]() {
+        m_elevators.at(index-1)->voice_connection();
+        timer->stop();
+    });
+
+    timer->start();
+
+}
+
+
 void ECS::emergency(const QString& em)
 {
-    m_browser->append(em);
-    m_browser->append("Moving all elevators to Floor 1");
+    m_browser->append("Alert , there is a: " + em);
+    //in all scenarios , the safe floor is 2
+    m_browser->append("Moving all elevators to Floor 2");
+
+    if (em == "door obstacles!"){
+        m_browser->append("door obstacles");
+    }
+    else if (em == "fire!"){
+        m_browser->append("fire");
+    }
+    else if (em == "overload!"){
+        m_browser->append("overload");
+    }
+    else {
+        m_browser->append("power out");
+    }
 /*
     Elevator *elevator1 = m_elevators.at(0);
     Elevator *elevator2 = m_elevators.at(1);
@@ -66,9 +98,10 @@ void ECS::find_elevator(const int floor , const QString direction){
 
 
 
-void ECS::communiate_doors(const int index){
+void ECS::communiate_doors(const int index , const int floor){
     if (m_elevators.at(index)->m_direction == "Stopped"){
-         m_browser->append("From ECS open doors");
+         m_elevators.at(index)->open_cab();
+         m_floors.at(floor)->open_Door();
 
          QTimer* timer = qobject_cast<QTimer*>(sender());
 
@@ -76,6 +109,21 @@ void ECS::communiate_doors(const int index){
              {
                  timer->stop();
              }
+
+
+
+         QTimer* timerclose = new QTimer(this);
+
+         timerclose->setInterval(10000);
+
+         connect(timerclose, &QTimer::timeout, this, [=]() {
+             m_elevators.at(index)->ring();
+             m_elevators.at(index)->close_cab();
+             m_floors.at(floor)->close_Door();
+             timerclose->stop();
+         });
+
+         timerclose->start();
 
     }
 
@@ -89,7 +137,7 @@ void ECS::allocation_strategyA(const int index , const int floor){
     timer->setInterval(500);
 
     connect(timer, &QTimer::timeout, this, [=]() {
-        communiate_doors(index); // pass the variable 42 to checkFunction()
+        communiate_doors(index , floor);
     });
 
     timer->start();
@@ -104,7 +152,7 @@ void ECS::allocation_strategyB(const int index ,const int floor){
     timer->setInterval(500);
 
     connect(timer, &QTimer::timeout, this, [=]() {
-        communiate_doors(index); // pass the variable 42 to checkFunction()
+        communiate_doors(index , floor);
     });
 
     timer->start();

@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->FireButton->setEnabled(false);
     ui->DoorObstaclesButton->setEnabled(false);
     ui->OverLoadButton->setEnabled(false);
-    ui->Help->setEnabled(false);
+    ui->HelpButton->setEnabled(false);
     ui->GoButton->setEnabled(false);
     ui->floorUp->setEnabled(false);
     ui->floorDown->setEnabled(false);
@@ -71,43 +71,47 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     connect(ui->GoButton, &QPushButton::clicked, this, [=]() {
-            int car = ui->carComboBox->currentText().toInt() -1;
+            int cab = ui->carComboBox->currentText().toInt() -1;
             int floor = ui->carFloorComboBox->currentText().toInt();
-            Elevator *elevator = elevators->at(car);
+            Elevator *elevator = elevators->at(cab);
             elevator->move(floor);
         });
 
     connect(ui->ElevatorStatusButton, &QPushButton::clicked, this, [=]() {
-            int car = ui->carComboBox->currentText().toInt() -1;
-            Elevator *elevator = elevators->at(car);
+            int cab = ui->carComboBox->currentText().toInt() -1;
+            Elevator *elevator = elevators->at(cab);
             elevator->status();
         });
 
 
-    connect(ui->floorUp, SIGNAL(clicked()), abutton, SLOT(illuminate()));
-    connect(ui->floorDown, SIGNAL(clicked()), abutton, SLOT(illuminate()));
-
     //connect(ui->FireButton, SIGNAL(clicked()), ecs, SLOT(emergency(string)));
 
     connect(ui->FireButton, &QPushButton::clicked, this, [=]() {
-            QString em = "Alert , Fire!";
+            QString em = "fire!";
             ecs->emergency(em);
         });
 
     connect(ui->PowerOutageButton, &QPushButton::clicked, this, [=]() {
-            QString em = "Alert , Power Outage!";
+            QString em = "power outage!";
             ecs->emergency(em);
         });
 
     connect(ui->DoorObstaclesButton, &QPushButton::clicked, this, [=]() {
-            QString em = "Alert , Door Obstacles!";
+            QString em = "door obstacle!";
             ecs->emergency(em);
         });
 
     connect(ui->OverLoadButton, &QPushButton::clicked, this, [=]() {
-            QString em = "Alert , Overload!";
+            QString em = "overload!";
             ecs->emergency(em);
         });
+
+    connect(ui->HelpButton, &QPushButton::clicked, this, [=]() {
+            int cab = ui->carComboBox->currentText().toInt();
+            ecs->help(cab);
+        });
+
+
 
 
 }
@@ -115,18 +119,22 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::initiate()
 {
     //add the floors numbers to the combo box
+    QList<int> elevators = {1, 2};
+    for (int i = 0; i < elevators.count(); ++i) {
+        ui->carComboBox->addItem(QString::number(elevators[i]));
+    }
+    ui->textBrowser->append("2 elevators added");
+
+
+    //add the floors numbers to the combo box
     QList<int> floors = {0,1, 2, 3,4};
     for (int i = 0; i < floors.count(); ++i) {
         ui->floorComboBox->addItem(QString::number(floors[i]));
         ui->carFloorComboBox->addItem(QString::number(floors[i]));
     }
 
-    //add the floors numbers to the combo box
-    QList<int> elevators = {1, 2};
-    for (int i = 0; i < elevators.count(); ++i) {
-        ui->carComboBox->addItem(QString::number(elevators[i]));
-
-    }
+    ui->textBrowser->append("4 floors added");
+    ui->textBrowser->append("4 floors added to elevator panel");
 
     //disbale initiate
     ui->initiateButton->setEnabled(false);
@@ -135,7 +143,7 @@ void MainWindow::initiate()
     ui->FireButton->setEnabled(true);
     ui->DoorObstaclesButton->setEnabled(true);
     ui->OverLoadButton->setEnabled(true);
-    ui->Help->setEnabled(true);
+    ui->HelpButton->setEnabled(true);
     ui->GoButton->setEnabled(true);
     ui->floorUp->setEnabled(true);
     ui->floorDown->setEnabled(true);

@@ -13,9 +13,10 @@ public:
     explicit ECS(QTextBrowser *browser, QList<Elevator*> *elevators, QList<Floor*> floors ,  QObject *parent = nullptr);
 
 public slots:
+     void help(const int index);
     void emergency(const QString& em);
     void find_elevator(const int floor , const QString direction);
-    void communiate_doors(const int index);
+    void communiate_doors(const int index , const int floor);
     void allocation_strategyA(const int elevator ,const int floor);
     void allocation_strategyB(const int elevator ,const int floor);
 

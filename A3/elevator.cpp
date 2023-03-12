@@ -30,7 +30,7 @@ bool Elevator::ring()
 {
     m_direction = "Stopped";
     m_idle = true;
-    m_browser->append("Elevator ringing! We have reached the Floor");
+    m_browser->append("Elevator ringing!");
     return true;
     QTimer *timer = new QTimer(this);
         timer->setInterval(1000);
@@ -115,6 +115,13 @@ void Elevator::move(const int to_Floor)
     m_browser->append(cur2);
 */
 
+
+}
+
+
+void Elevator::voice_connection()
+{
+    m_browser->append("Opened a voice connection...");
 
 }
 
