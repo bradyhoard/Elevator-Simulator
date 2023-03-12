@@ -15,6 +15,7 @@ public:
 
 public slots:
     bool ring();
+    bool change_passengers(int passengers_on , int passengers_off);
     void voice_connection();
     void status();
     void move( const int to_Floor);

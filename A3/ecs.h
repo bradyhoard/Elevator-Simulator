@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QTextBrowser>
+#include <QPushButton>
+#include <QComboBox>
 #include "elevator.h"
 #include "floor.h"
 
@@ -14,11 +16,12 @@ public:
 
 public slots:
      void help(const int index);
-    void emergency(const QString& em);
-    void find_elevator(const int floor , const QString direction);
-    void communiate_doors(const int index , const int floor);
-    void allocation_strategyA(const int elevator ,const int floor);
-    void allocation_strategyB(const int elevator ,const int floor);
+    void emergency(const QString& em , int elevator_index =0);
+    void find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *cofirmButton ,const int floor , const QString direction);
+    void move_elevator(QComboBox *passengersOn , QComboBox *passengersOff , QPushButton *cofirmButton , const int elevator_index, const int to_floor);
+    void communiate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *cofirmButton ,const int index , const int floor);
+    void allocation_strategyA(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *cofirmButton ,const int elevator ,const int floor);
+    void allocation_strategyB(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *cofirmButton ,const int elevator ,const int floor);
 
 private:
     QTextBrowser *m_browser;

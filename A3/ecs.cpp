@@ -1,6 +1,7 @@
 #include "ecs.h"
 #include <QDebug>
 #include <QTimer>
+#include <QPushButton>
 
 ECS::ECS(QTextBrowser *browser, QList<Elevator*> *elevators, QList<Floor*> floors,  QObject *parent) : QObject(parent)
 {
@@ -29,11 +30,14 @@ void ECS::help(const int index)
 }
 
 
-void ECS::emergency(const QString& em)
+void ECS::emergency(const QString& em , int index)
 {
     m_browser->append("Alert , there is a: " + em);
+
+
     //in all scenarios , the safe floor is 2
     m_browser->append("Moving all elevators to Floor 2");
+
 
     if (em == "door obstacles!"){
         m_browser->append("door obstacles");
@@ -42,7 +46,8 @@ void ECS::emergency(const QString& em)
         m_browser->append("fire");
     }
     else if (em == "overload!"){
-        m_browser->append("overload");
+         m_browser->append("On elevator : " + QString::number(index +1));
+
     }
     else {
         m_browser->append("power out");
@@ -64,7 +69,7 @@ void ECS::emergency(const QString& em)
 
 }
 
-void ECS::find_elevator(const int floor , const QString direction){
+void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int floor , const QString direction){
 
     m_browser->append("Floor number: " + QString::number(floor) + " | Requested to go : " + direction);
 
@@ -75,7 +80,7 @@ void ECS::find_elevator(const int floor , const QString direction){
     {
        if(m_elevators.at(i)->m_idle)
        {
-           allocation_strategyA(i, floor);
+           allocation_strategyA(passengersOn , passengersOff ,confirmButton ,i, floor);
            break;
        }
     }
@@ -87,7 +92,7 @@ void ECS::find_elevator(const int floor , const QString direction){
     {
        if(m_elevators.at(i)->m_direction == direction)
        {
-           allocation_strategyB(i, floor);
+           allocation_strategyB(passengersOn , passengersOff ,confirmButton , i, floor);
            break;
        }
     }
@@ -96,12 +101,31 @@ void ECS::find_elevator(const int floor , const QString direction){
 }
 
 
+void ECS::move_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int elevator_index, const int to_floor){
+    m_elevators.at(elevator_index)->move(to_floor);
+    QTimer* timer = new QTimer(this);
+
+    timer->setInterval(500);
+
+    connect(timer, &QTimer::timeout, this, [=]() {
+        communiate_doors(passengersOn , passengersOff  ,confirmButton , elevator_index , to_floor);
+    });
+
+    timer->start();
 
 
-void ECS::communiate_doors(const int index , const int floor){
+
+
+}
+
+
+void ECS::communiate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int index , const int floor){
     if (m_elevators.at(index)->m_direction == "Stopped"){
          m_elevators.at(index)->open_cab();
          m_floors.at(floor)->open_Door();
+         confirmButton->setEnabled(true);
+
+
 
          QTimer* timer = qobject_cast<QTimer*>(sender());
 
@@ -109,6 +133,16 @@ void ECS::communiate_doors(const int index , const int floor){
              {
                  timer->stop();
              }
+
+
+         connect(confirmButton, &QPushButton::clicked, this, [=]() {
+                 int on = passengersOn->currentText().toInt();
+                 int off = passengersOff->currentText().toInt();
+                 if (m_elevators.at(index)->change_passengers(on , off)){
+                     QString em = "overload!";
+                     emergency(em , index);
+                 }
+             });
 
 
 
@@ -120,6 +154,7 @@ void ECS::communiate_doors(const int index , const int floor){
              m_elevators.at(index)->ring();
              m_elevators.at(index)->close_cab();
              m_floors.at(floor)->close_Door();
+             confirmButton->setEnabled(false);
              timerclose->stop();
          });
 
@@ -129,7 +164,7 @@ void ECS::communiate_doors(const int index , const int floor){
 
 }
 
-void ECS::allocation_strategyA(const int index , const int floor){
+void ECS::allocation_strategyA(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int index , const int floor){
 
     m_elevators.at(index)->move(floor);
     QTimer* timer = new QTimer(this);
@@ -137,7 +172,7 @@ void ECS::allocation_strategyA(const int index , const int floor){
     timer->setInterval(500);
 
     connect(timer, &QTimer::timeout, this, [=]() {
-        communiate_doors(index , floor);
+        communiate_doors(passengersOn , passengersOff  ,confirmButton , index , floor);
     });
 
     timer->start();
@@ -145,14 +180,14 @@ void ECS::allocation_strategyA(const int index , const int floor){
 
 }
 
-void ECS::allocation_strategyB(const int index ,const int floor){
+void ECS::allocation_strategyB(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int index ,const int floor){
     m_elevators.at(index)->move(floor);
     QTimer* timer = new QTimer(this);
 
     timer->setInterval(500);
 
     connect(timer, &QTimer::timeout, this, [=]() {
-        communiate_doors(index , floor);
+        communiate_doors(passengersOn , passengersOff  , confirmButton , index , floor);
     });
 
     timer->start();

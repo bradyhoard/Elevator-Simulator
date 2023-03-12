@@ -130,6 +130,26 @@ void Elevator::open_cab()
     m_browser->append("Cab Door opened");
 }
 
+bool Elevator::change_passengers(int on , int off)
+{
+    m_browser->append("Passengers getting on: " + QString::number(on));
+    m_browser->append("Passengers getting off: " + QString::number(off));
+    m_passengers -= off;
+    if (m_passengers < 0){
+        m_browser->append("Invalid passenger operation. Setting passengers to 0");
+        m_passengers = 0;
+    }
+    m_passengers += on;
+    //assume the overload capacity is 6 people
+    if (m_passengers >= 6){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+
 void Elevator::close_cab()
 {
     m_browser->append("Cab Door closed");

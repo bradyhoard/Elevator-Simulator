@@ -10,7 +10,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 {
     ui->setupUi(this);
-    Button* abutton = new Button(ui->textBrowser, this);
     QList<Elevator*> *elevators = new QList<Elevator*>();
     QList<Floor*> *floors = new QList<Floor*>();
 
@@ -54,18 +53,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->floorUp->setEnabled(false);
     ui->floorDown->setEnabled(false);
     ui->ElevatorStatusButton->setEnabled(false);
+    ui->PassengersConfirm->setEnabled(false);
 
 
     connect(ui->initiateButton, &QPushButton::clicked, this, &MainWindow::initiate);
 
     connect(ui->floorUp, &QPushButton::clicked, this, [=]() {
             int floor_number = ui->floorComboBox->currentText().toInt();
-            ecs->find_elevator(floor_number , "Up");
+            ecs->find_elevator(ui->passengers_on , ui->passengers_off ,ui->PassengersConfirm , floor_number , "Up");
         });
 
     connect(ui->floorDown, &QPushButton::clicked, this, [=]() {
             int floor_number = ui->floorComboBox->currentText().toInt();
-            ecs->find_elevator(floor_number , "Down");
+            ecs->find_elevator(ui->passengers_on , ui->passengers_off ,ui->PassengersConfirm ,floor_number , "Down");
         });
 
 
@@ -73,8 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->GoButton, &QPushButton::clicked, this, [=]() {
             int cab = ui->carComboBox->currentText().toInt() -1;
             int floor = ui->carFloorComboBox->currentText().toInt();
-            Elevator *elevator = elevators->at(cab);
-            elevator->move(floor);
+            ecs->move_elevator(ui->passengers_on , ui->passengers_off , ui->PassengersConfirm , cab , floor);
         });
 
     connect(ui->ElevatorStatusButton, &QPushButton::clicked, this, [=]() {
@@ -135,6 +134,12 @@ void MainWindow::initiate()
 
     ui->textBrowser->append("4 floors added");
     ui->textBrowser->append("4 floors added to elevator panel");
+
+    QList<int> passengers = {0,1,2,3};
+    for (int i = 0; i < passengers.count(); ++i) {
+        ui->passengers_on->addItem(QString::number(passengers[i]));
+        ui->passengers_off->addItem(QString::number(passengers[i]));
+    }
 
     //disbale initiate
     ui->initiateButton->setEnabled(false);
