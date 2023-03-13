@@ -121,6 +121,7 @@ void MainWindow::initiate()
     QList<int> elevators = {1, 2};
     for (int i = 0; i < elevators.count(); ++i) {
         ui->carComboBox->addItem(QString::number(elevators[i]));
+         ui->passengers_cab->addItem(QString::number(elevators[i]));
     }
     ui->textBrowser->append("2 elevators added");
 

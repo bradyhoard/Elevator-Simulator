@@ -26,19 +26,10 @@ void Elevator::status()
 
 }
 
-bool Elevator::ring()
+void Elevator::ring()
 {
     m_direction = "Stopped";
     m_browser->append("Elevator ringing!");
-    return true;
-    QTimer *timer = new QTimer(this);
-        timer->setInterval(1000);
-        QObject::connect(timer, &QTimer::timeout, [=]() {
-            timer->stop();
-            timer->deleteLater();
-            open_cab();
-        });
-        timer->start();
 }
 
 void Elevator::move(const int to_Floor)
@@ -52,7 +43,7 @@ void Elevator::move(const int to_Floor)
         QTimer *timer = new QTimer(this);
             timer->setInterval(2000);
             QObject::connect(timer, &QTimer::timeout, [=]() {
-                m_browser->append("Moving up to: ");
+                m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving up to: ");
                 m_browser->insertPlainText(QString::number(m_floor_number));
                 m_floor_number++;
                 if (m_floor_number > to_Floor) {
@@ -84,7 +75,7 @@ void Elevator::move(const int to_Floor)
         QTimer *timer = new QTimer(this);
             timer->setInterval(1000);
             QObject::connect(timer, &QTimer::timeout, [=]() {
-                m_browser->append("Moving down to: ");
+                m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving down to: ");
                 m_browser->insertPlainText(QString::number(m_floor_number));
                 m_floor_number--;
                 if (m_floor_number < to_Floor) {
@@ -133,7 +124,7 @@ void Elevator::voice_connection()
 
 void Elevator::open_cab()
 {
-    m_browser->append("Cab Door opened");
+    m_browser->append("Cab(" + QString::number(m_elevator_id) + ") door opened");
 }
 
 bool Elevator::change_passengers(int on , int off)
@@ -150,7 +141,7 @@ bool Elevator::change_passengers(int on , int off)
     if (m_passengers >= 6){
         return true;
     }
-    else if (m_passengers ==0){
+    else if (m_passengers == 0){
         m_idle = true;
         return false;
     }
@@ -162,7 +153,7 @@ bool Elevator::change_passengers(int on , int off)
 
 void Elevator::close_cab()
 {
-    m_browser->append("Cab Door closed");
+    m_browser->append("Cab(" + QString::number(m_elevator_id) + ") door closed");
 }
 
 

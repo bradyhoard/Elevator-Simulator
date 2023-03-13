@@ -15,18 +15,7 @@ ECS::ECS(QTextBrowser *browser, QList<Elevator*> *elevators, QList<Floor*> floor
 void ECS::help(const int index)
 {
     m_browser->append("Received help signal from elevator:   " + QString::number(index));
-
-    QTimer* timer = new QTimer(this);
-
-    timer->setInterval(1000);
-
-    connect(timer, &QTimer::timeout, this, [=]() {
-        m_elevators.at(index-1)->voice_connection();
-        timer->stop();
-    });
-
-    timer->start();
-
+    m_elevators.at(index-1)->voice_connection();
 }
 
 
@@ -124,16 +113,7 @@ void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPus
 
 void ECS::move_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int elevator_index, const int to_floor){
     m_elevators.at(elevator_index)->move(to_floor);
-    QTimer* timer = new QTimer(this);
-
-    timer->setInterval(500);
-
-    connect(timer, &QTimer::timeout, this, [=]() {
-        communiate_doors(passengersOn , passengersOff  ,confirmButton , elevator_index , to_floor);
-    });
-
-    timer->start();
-
+    communiate_doors(passengersOn , passengersOff  ,confirmButton , elevator_index , to_floor);
 }
 
 

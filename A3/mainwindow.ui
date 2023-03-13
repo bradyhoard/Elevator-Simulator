@@ -19,8 +19,8 @@
      <rect>
       <x>5</x>
       <y>20</y>
-      <width>481</width>
-      <height>361</height>
+      <width>491</width>
+      <height>461</height>
      </rect>
     </property>
    </widget>
@@ -106,19 +106,19 @@
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>120</y>
+      <y>110</y>
       <width>271</width>
-      <height>111</height>
+      <height>61</height>
      </rect>
     </property>
     <property name="title">
-     <string>Floors</string>
+     <string>Floor</string>
     </property>
     <widget class="QComboBox" name="floorComboBox">
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>30</y>
+       <y>20</y>
        <width>81</width>
        <height>31</height>
       </rect>
@@ -127,8 +127,8 @@
     <widget class="QPushButton" name="floorUp">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>70</y>
+       <x>100</x>
+       <y>20</y>
        <width>80</width>
        <height>25</height>
       </rect>
@@ -140,8 +140,8 @@
     <widget class="QPushButton" name="floorDown">
      <property name="geometry">
       <rect>
-       <x>80</x>
-       <y>70</y>
+       <x>190</x>
+       <y>20</y>
        <width>80</width>
        <height>25</height>
       </rect>
@@ -155,13 +155,13 @@
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>240</y>
+      <y>180</y>
       <width>271</width>
       <height>151</height>
      </rect>
     </property>
     <property name="title">
-     <string>Elevators</string>
+     <string>Elevator</string>
     </property>
     <widget class="QLabel" name="label_2">
      <property name="geometry">
@@ -252,8 +252,8 @@
    <widget class="QPushButton" name="initiateButton">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>390</y>
+      <x>10</x>
+      <y>510</y>
       <width>491</width>
       <height>25</height>
      </rect>
@@ -266,13 +266,13 @@
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>390</y>
+      <y>330</y>
       <width>271</width>
-      <height>171</height>
+      <height>221</height>
      </rect>
     </property>
     <property name="title">
-     <string>Passengers</string>
+     <string>Passenger</string>
     </property>
     <widget class="QComboBox" name="passengers_on">
      <property name="geometry">
@@ -324,7 +324,7 @@
      <property name="geometry">
       <rect>
        <x>120</x>
-       <y>110</y>
+       <y>160</y>
        <width>80</width>
        <height>25</height>
       </rect>
@@ -336,14 +336,37 @@
     <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>140</y>
+       <x>10</x>
+       <y>190</y>
        <width>201</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
       <string>(only shows when doors are open)</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>71</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Cab</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="passengers_cab">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>100</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
      </property>
     </widget>
    </widget>

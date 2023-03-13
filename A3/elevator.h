@@ -15,7 +15,7 @@ public:
     int m_floor_number;
 
 public slots:
-    bool ring();
+    void ring();
     bool change_passengers(int passengers_on , int passengers_off);
     void voice_connection();
     void status();

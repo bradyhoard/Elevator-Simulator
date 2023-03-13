@@ -8,10 +8,10 @@ Floor::Floor(QTextBrowser *browser, int floor_number, QObject *parent) : QObject
 
 void Floor::open_Door()
 {
-    m_browser->append("Floor" + QString::number(m_floor_number) + ":  doors opened");
+    m_browser->append("Floor(" + QString::number(m_floor_number) + ") :  doors opened");
 }
 
 void Floor::close_Door()
 {
-    m_browser->append("Floor" + QString::number(m_floor_number) + ":  doors closed");
+    m_browser->append("Floor(" + QString::number(m_floor_number) + ") :  doors closed");
 }
