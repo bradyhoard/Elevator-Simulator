@@ -12,6 +12,7 @@ public:
     explicit Elevator(QTextBrowser *browser, bool idle, QString m_direction, int floor_number,  int m_passengers, int elevator_id , QObject *parent = nullptr);
     QString m_direction;
     bool m_idle;
+    int m_floor_number;
 
 public slots:
     bool ring();
@@ -26,7 +27,6 @@ public slots:
 
 private:
     QTextBrowser *m_browser;
-    int m_floor_number;
     int m_elevator_id;
     //number of passengeres that are in the elevator
     int m_passengers;

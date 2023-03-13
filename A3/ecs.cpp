@@ -72,6 +72,7 @@ void ECS::emergency(const QString& em , int index)
 void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int floor , const QString direction){
 
     m_browser->append("Floor number: " + QString::number(floor) + " | Requested to go : " + direction);
+    bool found_elevator = false;
 
 
     //find the first idle elevator
@@ -80,21 +81,41 @@ void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPus
     {
        if(m_elevators.at(i)->m_idle)
        {
+           m_browser->append("Allocation_strategyA has been activated | found an elevator that is idle");
            allocation_strategyA(passengersOn , passengersOff ,confirmButton ,i, floor);
+           found_elevator = true;
            break;
        }
     }
 
 
-    //find the elevator going in the same direction
-
-    for(int i = 0; i < m_elevators.size(); i++)
+    //find the elevator going in the same direction if not found from above
+    if (!found_elevator)
     {
-       if(m_elevators.at(i)->m_direction == direction)
-       {
-           allocation_strategyB(passengersOn , passengersOff ,confirmButton , i, floor);
-           break;
-       }
+
+
+
+        for(int i = 0; i < m_elevators.size(); i++)
+        {
+           if((m_elevators.at(i)->m_direction == direction && direction =="Up" && m_elevators.at(i)->m_floor_number < floor)|| (m_elevators.at(i)->m_direction == direction && direction =="Down" && m_elevators.at(i)->m_floor_number > floor));
+           {
+               m_browser->append("Allocation_strategyB has been activated | found an elevator that is going in the same direciton and approaching the desired floor");
+               m_elevators.at(i)->m_direction = "Stopped";
+               //wait 2.5 seconds before the elevator can make any movements and be able to change directions
+               QTimer* timeWait = new QTimer(this);
+
+               timeWait->setInterval(2500);
+
+               connect(timeWait, &QTimer::timeout, this, [=]() {
+                   allocation_strategyB(passengersOn , passengersOff ,confirmButton , i, floor);
+                   timeWait->stop();
+
+               });
+               timeWait->start();
+               break;
+
+           }
+        }
     }
 
 
@@ -112,9 +133,6 @@ void ECS::move_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPus
     });
 
     timer->start();
-
-
-
 
 }
 

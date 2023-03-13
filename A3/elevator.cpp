@@ -29,7 +29,6 @@ void Elevator::status()
 bool Elevator::ring()
 {
     m_direction = "Stopped";
-    m_idle = true;
     m_browser->append("Elevator ringing!");
     return true;
     QTimer *timer = new QTimer(this);
@@ -51,7 +50,7 @@ void Elevator::move(const int to_Floor)
         m_direction = "Up";
         m_idle = false;
         QTimer *timer = new QTimer(this);
-            timer->setInterval(1000);
+            timer->setInterval(2000);
             QObject::connect(timer, &QTimer::timeout, [=]() {
                 m_browser->append("Moving up to: ");
                 m_browser->insertPlainText(QString::number(m_floor_number));
@@ -61,6 +60,13 @@ void Elevator::move(const int to_Floor)
                     timer->stop();
                     timer->deleteLater();
                     ring();
+                }
+                else if (m_direction == "Stopped"){
+                    m_browser->append("Elevator has been stopped");
+                    timer->stop();
+                    timer->deleteLater();
+                    ring();
+
                 }
             });
             for(int i = m_floor_number + 1; i <= to_Floor; i++)
@@ -143,6 +149,10 @@ bool Elevator::change_passengers(int on , int off)
     //assume the overload capacity is 6 people
     if (m_passengers >= 6){
         return true;
+    }
+    else if (m_passengers ==0){
+        m_idle = true;
+        return false;
     }
     else{
         return false;
