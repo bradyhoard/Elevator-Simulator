@@ -56,7 +56,6 @@ void Elevator::move(const int to_Floor)
                     m_browser->append("Elevator has been stopped");
                     timer->stop();
                     timer->deleteLater();
-                    ring();
 
                 }
             });
@@ -118,7 +117,7 @@ void Elevator::move(const int to_Floor)
 
 void Elevator::voice_connection()
 {
-    m_browser->append("Opened a voice connection...");
+    m_browser->append("Cab(" + QString::number(m_elevator_id) + ") Opened a voice connection...");
 
 }
 

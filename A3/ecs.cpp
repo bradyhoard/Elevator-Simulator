@@ -124,15 +124,6 @@ void ECS::communiate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,Q
          confirmButton->setEnabled(true);
 
 
-
-         QTimer* timer = qobject_cast<QTimer*>(sender());
-
-             if (timer != nullptr)
-             {
-                 timer->stop();
-             }
-
-
          connect(confirmButton, &QPushButton::clicked, this, [=]() {
                  int on = passengersOn->currentText().toInt();
                  int off = passengersOff->currentText().toInt();
@@ -165,30 +156,16 @@ void ECS::communiate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,Q
 void ECS::allocation_strategyA(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int index , const int floor){
 
     m_elevators.at(index)->move(floor);
-    QTimer* timer = new QTimer(this);
-
-    timer->setInterval(500);
-
-    connect(timer, &QTimer::timeout, this, [=]() {
-        communiate_doors(passengersOn , passengersOff  ,confirmButton , index , floor);
-    });
-
-    timer->start();
+    communiate_doors(passengersOn , passengersOff  ,confirmButton , index , floor);
 
 
 }
 
 void ECS::allocation_strategyB(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int index ,const int floor){
     m_elevators.at(index)->move(floor);
-    QTimer* timer = new QTimer(this);
+    communiate_doors(passengersOn , passengersOff  , confirmButton , index , floor);
 
-    timer->setInterval(500);
 
-    connect(timer, &QTimer::timeout, this, [=]() {
-        communiate_doors(passengersOn , passengersOff  , confirmButton , index , floor);
-    });
-
-    timer->start();
 
 }
 
