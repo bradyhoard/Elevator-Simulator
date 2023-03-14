@@ -133,10 +133,10 @@ void ECS::move_elevator(QComboBox* passengersOn, QComboBox* passengersOff, QPush
 
 
 void ECS::communicate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton ,  QComboBox *cab , const int index , const int floor){
-    if (m_elevators.at(index)->m_direction == "Stopped"){
+
          m_elevators.at(index)->open_cab();
          m_floors.at(floor)->open_Door();
-         confirmButton->setEnabled(true);
+         confirmButton->setEnabled(false);
 
 
 
@@ -150,23 +150,16 @@ void ECS::communicate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,
                  }
              });
 
-
-
-         QTimer* timerclose = new QTimer(this);
-
-         timerclose->setInterval(1000);
-
-         connect(timerclose, &QTimer::timeout, this, [=]() {
+         QTimer::singleShot(1000, [=]() {
              m_elevators.at(index)->ring();
              m_elevators.at(index)->close_cab();
              m_floors.at(floor)->close_Door();
              confirmButton->setEnabled(false);
-             timerclose->stop();
          });
 
-         timerclose->start();
 
-    }
+
+
 
 }
 

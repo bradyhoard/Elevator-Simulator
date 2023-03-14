@@ -74,7 +74,19 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->GoButton, &QPushButton::clicked, this, [=]() {
             int cab = ui->carComboBox->currentText().toInt() -1;
             int floor = ui->carFloorComboBox->currentText().toInt();
-            ecs->move_elevator(ui->passengers_on , ui->passengers_off , ui->PassengersConfirm ,ui->passengers_cab , cab , floor);
+
+            // Create a new thread and move the elevator in that thread
+            QThread* thread = new QThread();
+            connect(thread, &QThread::started, ecs, [=]() {
+                ecs->move_elevator(ui->passengers_on , ui->passengers_off , ui->PassengersConfirm ,ui->passengers_cab , cab , floor);
+                thread->quit();
+            });
+
+            // When the thread is finished, delete it
+            connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+
+            // Start the thread
+            thread->start();
         });
 
     connect(ui->ElevatorStatusButton, &QPushButton::clicked, this, [=]() {
