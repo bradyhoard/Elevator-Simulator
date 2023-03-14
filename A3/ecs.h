@@ -25,6 +25,7 @@ public slots:
     void communicate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *cofirmButton ,  QComboBox *cab ,const int index , const int floor);
     void communicate_doors(const int index ,  QPushButton *cofirmButton , const int floor = 2);
     void allocation_strategy_move(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *cofirmButton ,  QComboBox *cab ,const int elevator ,const int floor);
+    QList<Elevator*> get_elevators();
 
 private:
     QTextBrowser *m_browser;

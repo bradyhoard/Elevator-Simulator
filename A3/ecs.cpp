@@ -136,7 +136,7 @@ void ECS::communicate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,
 
          m_elevators.at(index)->open_cab();
          m_floors.at(floor)->open_Door();
-         confirmButton->setEnabled(false);
+         confirmButton->setEnabled(true);
 
 
 
@@ -150,7 +150,7 @@ void ECS::communicate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,
                  }
              });
 
-         QTimer::singleShot(1000, [=]() {
+         QTimer::singleShot(10000, [=]() {
              m_elevators.at(index)->ring();
              m_elevators.at(index)->close_cab();
              m_floors.at(floor)->close_Door();
@@ -187,5 +187,9 @@ void ECS::allocation_strategy_move(QComboBox *passengersOn , QComboBox *passenge
     Elevator* elevator = m_elevators.at(index);
     elevator->move(floor);
     communicate_doors(passengersOn, passengersOff, confirmButton, cab, index, floor);
+}
+
+QList<Elevator*> ECS::get_elevators() {
+    return m_elevators;
 }
 

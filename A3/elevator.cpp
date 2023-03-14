@@ -13,7 +13,7 @@ Elevator::Elevator(QTextBrowser *browser, bool idle, QString direction, int floo
     m_floor_number = floor_number;
     m_elevator_id = elevator_id;
     m_passengers = passengers;
-    ele_timer = new QTimer(nullptr);
+    ele_timer = new QTimer(this);
 
 }
 
@@ -32,7 +32,7 @@ void Elevator::status()
 void Elevator::ring()
 {
     m_direction = "Stopped";
-    m_browser->append("Elevator ringing!");
+    m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") ringing!");
 
 }
 
@@ -44,7 +44,7 @@ void Elevator::move(int to_Floor) {
            m_direction = "Up";
            m_idle = false;
                ele_timer = new QTimer(this);
-               ele_timer->setInterval(1000);
+               ele_timer->setInterval(2000);
                QObject::connect(ele_timer, &QTimer::timeout, [=]() {
                    m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving up to: " + QString::number(m_floor_number));
 
@@ -52,6 +52,7 @@ void Elevator::move(int to_Floor) {
                for(int i = m_floor_number +1; i <= to_Floor; i++)
                {
                    m_floor_number = i;
+                   ele_timer->stop();
                    ele_timer->start();
                    QEventLoop loop;
                    QObject::connect(ele_timer, &QTimer::timeout, &loop, &QEventLoop::quit);
@@ -73,32 +74,33 @@ void Elevator::move(int to_Floor) {
        else if (m_floor_number > to_Floor){
            m_direction = "Down";
            m_idle = false;
-               ele_timer = new QTimer(this);
-               ele_timer->setInterval(1000);
-               QObject::connect(ele_timer, &QTimer::timeout, [=]() {
-                   m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving down to: " + QString::number(m_floor_number));
+           ele_timer = new QTimer(this);
+           ele_timer->setInterval(2000);
+           QObject::connect(ele_timer, &QTimer::timeout, [=]() {
+               m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving down to: " + QString::number(m_floor_number));
+           });
 
-               });
-               for(int i = m_floor_number - 1; i >= to_Floor; i--)
-               {
-                   m_floor_number = i;
-                   ele_timer->start();
-                   QEventLoop loop;
-                   QObject::connect(ele_timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-                   loop.exec();
-                   if (m_floor_number <= to_Floor) {
-                       ele_timer->stop();
-                       ring();
-                       break;
-                   }
-                   else if (m_direction == "Stopped" && i != to_Floor) {
-                       m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - stopped");
-                       ele_timer->stop();
-                       break;
-                   }
-
-                   m_floor_number--;
+           for(int i = m_floor_number - 1; i >= to_Floor; i--)
+           {
+               m_floor_number = i;
+               ele_timer->stop();
+               ele_timer->start();
+               QEventLoop loop;
+               QObject::connect(ele_timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+               loop.exec();
+               if (m_floor_number <= to_Floor) {
+                   ele_timer->stop();
+                   ring();
+                   break;
                }
+               else if (m_direction == "Stopped" && i != to_Floor) {
+                   m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - stopped");
+                   ele_timer->stop();
+                   break;
+               }
+
+               m_floor_number--;
+           }
            }
 
        else{
@@ -106,6 +108,10 @@ void Elevator::move(int to_Floor) {
             ring();
        }
 }
+
+
+
+
 
 void Elevator::voice_connection()
 {

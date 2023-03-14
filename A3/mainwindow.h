@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "ecs.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -13,10 +14,11 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
+    ECS *ecs;
     ~MainWindow();
 
 private:
     Ui::MainWindow *ui;
-    void initiate();
+
 };
 #endif // MAINWINDOW_H

@@ -33,7 +33,6 @@ private:
     //number of passengeres that are in the elevator
     int m_passengers;
     QTimer *ele_timer;
-    QThread *ele_thread;
 
 
 };
