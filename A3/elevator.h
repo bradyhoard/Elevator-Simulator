@@ -26,8 +26,6 @@ public slots:
     void open_cab();
     void close_cab();
 
-signals:
-    void stopped();
 
 private:
 
@@ -37,8 +35,6 @@ private:
     QTimer *ele_timer;
     QThread *ele_thread;
 
-signals:
-    void destination_reached();
 
 };
 

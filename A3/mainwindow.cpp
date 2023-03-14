@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 {
     ui->setupUi(this);
+
     QList<Elevator*> *elevators = new QList<Elevator*>();
     QList<Floor*> *floors = new QList<Floor*>();
 

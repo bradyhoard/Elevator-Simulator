@@ -5,6 +5,9 @@
 #include <QTextBrowser>
 #include <QPushButton>
 #include <QComboBox>
+#include <QtCore>
+#include <QtConcurrent/QtConcurrent>
+#include <QtWidgets>
 #include "elevator.h"
 #include "floor.h"
 
@@ -21,13 +24,14 @@ public slots:
     void move_elevator(QComboBox *passengersOn , QComboBox *passengersOff , QPushButton *cofirmButton ,  QComboBox *cab , const int elevator_index, const int to_floor);
     void communicate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *cofirmButton ,  QComboBox *cab ,const int index , const int floor);
     void communicate_doors(const int index ,  QPushButton *cofirmButton , const int floor = 2);
-    void allocation_strategyA(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *cofirmButton ,  QComboBox *cab ,const int elevator ,const int floor);
-    void allocation_strategyB(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *cofirmButton ,  QComboBox *cab ,const int elevator ,const int floor);
+    void allocation_strategy_move(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *cofirmButton ,  QComboBox *cab ,const int elevator ,const int floor);
 
 private:
     QTextBrowser *m_browser;
     QList<Elevator*> m_elevators;
     QList<Floor*> m_floors;
+    QList<QFuture<void>> m_futures;
+    QList<QFutureWatcher<void>> m_future_watchers;
 };
 
 #endif // ECS_H

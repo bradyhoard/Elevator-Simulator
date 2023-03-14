@@ -33,7 +33,7 @@ void Elevator::ring()
 {
     m_direction = "Stopped";
     m_browser->append("Elevator ringing!");
-    emit destination_reached();
+
 }
 
 void Elevator::move(int to_Floor) {
@@ -44,7 +44,7 @@ void Elevator::move(int to_Floor) {
            m_direction = "Up";
            m_idle = false;
                ele_timer = new QTimer(this);
-               ele_timer->setInterval(2000);
+               ele_timer->setInterval(1000);
                QObject::connect(ele_timer, &QTimer::timeout, [=]() {
                    m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving up to: ");
                    m_browser->insertPlainText(QString::number(m_floor_number));
@@ -53,6 +53,7 @@ void Elevator::move(int to_Floor) {
                        m_floor_number--;
                        ele_timer->stop();
                        ring();
+
                    }
                    else if (m_direction == "Stopped"){
                        m_browser->append("Elevator has been stopped");
@@ -72,26 +73,32 @@ void Elevator::move(int to_Floor) {
        else if (m_floor_number > to_Floor){
            m_direction = "Down";
            m_idle = false;
-               ele_timer->setInterval(1000);
-               QObject::connect(ele_timer, &QTimer::timeout, [=]() {
-                   m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving down to: ");
-                   m_browser->insertPlainText(QString::number(m_floor_number));
-                   m_floor_number--;
-                   if (m_floor_number < to_Floor) {
-                       m_floor_number++;
-                       ele_timer->stop();
-                       ring();
-                   }
-               });
-               for(int i = m_floor_number - 1; i >= to_Floor; i--)
-               {
-                   m_floor_number = i;
-                   ele_timer->start();
-                   QEventLoop loop;
-                   QObject::connect(ele_timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-                   loop.exec();
-               }
+           ele_timer = new QTimer(this);
+           ele_timer->setInterval(1000);
+           QObject::connect(ele_timer, &QTimer::timeout, [=]() {
+               m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving down to: ");
+               m_browser->insertPlainText(QString::number(m_floor_number));
+               m_floor_number--;
+               if (m_floor_number < to_Floor) {
+                   m_floor_number++;
+                   ele_timer->stop();
+                   ring();
 
+               }
+               else if (m_direction == "Stopped"){
+                   m_browser->append("Elevator has been stopped");
+                   ele_timer->stop();
+
+               }
+           });
+           for(int i = m_floor_number; i >= to_Floor; i--)
+           {
+               m_floor_number = i;
+               ele_timer->start();
+               QEventLoop loop;
+               QObject::connect(ele_timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+               loop.exec();
+           }
            }
 
        else{

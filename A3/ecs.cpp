@@ -77,8 +77,10 @@ void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPus
     {
        if(m_elevators.at(i)->m_idle)
        {
-           m_browser->append("Allocation_strategyA has been activated | found an elevator that is idle");
-           allocation_strategyA(passengersOn , passengersOff ,confirmButton , cab, i, floor);
+           m_browser->append("Allocation_strategy (A) has been activated | found an elevator that is idle");
+           QTimer::singleShot(2500, [=]() {
+               allocation_strategy_move(passengersOn , passengersOff ,confirmButton , cab, i, floor);
+           });
            found_elevator = true;
            break;
        }
@@ -95,19 +97,14 @@ void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPus
         {
            if((m_elevators.at(i)->m_direction == direction && direction =="Up" && m_elevators.at(i)->m_floor_number < floor)|| (m_elevators.at(i)->m_direction == direction && direction =="Down" && m_elevators.at(i)->m_floor_number > floor))
            {
-               m_browser->append("Allocation_strategyB has been activated | found an elevator that is going in the same direciton and approaching the desired floor");
+               m_browser->append("Allocation_strategy (B) has been activated | found an elevator that is going in the same direciton and approaching the desired floor");
                m_elevators.at(i)->m_direction = "Stopped";
                //wait 2.5 seconds before the elevator can make any movements and be able to change directions
-               QTimer* timeWait = new QTimer(this);
 
-               timeWait->setInterval(2500);
 
-               connect(timeWait, &QTimer::timeout, this, [=]() {
-                   allocation_strategyB(passengersOn , passengersOff ,confirmButton , cab, i, floor);
-                   timeWait->stop();
-
+               QTimer::singleShot(2500, [=]() {
+                   allocation_strategy_move(passengersOn , passengersOff ,confirmButton , cab, i, floor);
                });
-               timeWait->start();
                break;
 
            }
@@ -123,12 +120,10 @@ void ECS::move_elevator(QComboBox* passengersOn, QComboBox* passengersOff, QPush
 
     // Only move the elevator if it is not currently in motion
     if (elevator->m_direction == "Stopped") {
-        // Move the elevator and wait for it to arrive at the target floor before proceeding
-        connect(elevator, &Elevator::destination_reached, [=]() {
-            communicate_doors(passengersOn, passengersOff, confirmButton, cab, elevator_index, to_floor);
-        });
-
         elevator->move(to_floor);
+        communicate_doors(passengersOn, passengersOff, confirmButton, cab, elevator_index, to_floor);
+
+
     }
 }
 
@@ -138,6 +133,7 @@ void ECS::communicate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,
          m_elevators.at(index)->open_cab();
          m_floors.at(floor)->open_Door();
          confirmButton->setEnabled(true);
+
 
 
          connect(confirmButton, &QPushButton::clicked, this, [=]() {
@@ -154,7 +150,7 @@ void ECS::communicate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,
 
          QTimer* timerclose = new QTimer(this);
 
-         timerclose->setInterval(10000);
+         timerclose->setInterval(1000);
 
          connect(timerclose, &QTimer::timeout, this, [=]() {
              m_elevators.at(index)->ring();
@@ -189,30 +185,10 @@ void ECS::communicate_doors(const int index , QPushButton *confirmButton, const 
 
 }
 
-void ECS::allocation_strategyA(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton ,  QComboBox *cab , const int index , const int floor){
+
+void ECS::allocation_strategy_move(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton ,  QComboBox *cab , const int index ,const int floor){
     Elevator* elevator = m_elevators.at(index);
-
-    connect(elevator, &Elevator::destination_reached, [=]() {
-        communicate_doors(passengersOn, passengersOff, confirmButton, cab, index, floor);
-    });
-
     elevator->move(floor);
-
-
-
-
-}
-
-void ECS::allocation_strategyB(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton ,  QComboBox *cab , const int index ,const int floor){
-    Elevator* elevator = m_elevators.at(index);
-
-    connect(elevator, &Elevator::destination_reached, [=]() {
-        communicate_doors(passengersOn, passengersOff, confirmButton, cab, index, floor);
-    });
-
-    elevator->move(floor);
-
-
-
+    communicate_doors(passengersOn, passengersOff, confirmButton, cab, index, floor);
 }
 
