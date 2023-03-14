@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //all the elevators added to the ECS
     Elevator* elevator1 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 1, this);
-    Elevator* elevator2 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 2, this);
+    Elevator* elevator2 = new Elevator(ui->textBrowser, false , "Stopped", 0 ,0, 2, this);
     elevators->push_back(elevator1);
     elevators->push_back(elevator2);
 

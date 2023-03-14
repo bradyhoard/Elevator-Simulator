@@ -3,6 +3,7 @@
 #include <QTimer>
 #include <QPushButton>
 #include <QEventLoop>
+#include <QtConcurrent/QtConcurrent>
 
 ECS::ECS(QTextBrowser *browser, QList<Elevator*> *elevators, QList<Floor*> floors,  QObject *parent) : QObject(parent)
 {
@@ -77,7 +78,7 @@ void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPus
     {
        if(m_elevators.at(i)->m_idle)
        {
-           m_browser->append("Allocation_strategy (A) has been activated | found an elevator that is idle");
+           m_browser->append("Allocation_strategy (A) has been activated | found an elevator that is idle - Elevator : " + QString::number(i+1));
            QTimer::singleShot(2500, [=]() {
                allocation_strategy_move(passengersOn , passengersOff ,confirmButton , cab, i, floor);
            });
@@ -97,14 +98,15 @@ void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPus
         {
            if((m_elevators.at(i)->m_direction == direction && direction =="Up" && m_elevators.at(i)->m_floor_number < floor)|| (m_elevators.at(i)->m_direction == direction && direction =="Down" && m_elevators.at(i)->m_floor_number > floor))
            {
-               m_browser->append("Allocation_strategy (B) has been activated | found an elevator that is going in the same direciton and approaching the desired floor");
+               m_browser->append("Allocation_strategy (B) has been activated | found an elevator that is going in the same direciton and approaching the desired floor - Elevator : " + QString::number(i+1));
                m_elevators.at(i)->m_direction = "Stopped";
-               //wait 2.5 seconds before the elevator can make any movements and be able to change directions
+               //wait 1.5 seconds before the elevator can make any movements and be able to change destinations
 
 
-               QTimer::singleShot(2500, [=]() {
+               QTimer::singleShot(1500, [=]() {
                    allocation_strategy_move(passengersOn , passengersOff ,confirmButton , cab, i, floor);
                });
+
                break;
 
            }
@@ -121,7 +123,9 @@ void ECS::move_elevator(QComboBox* passengersOn, QComboBox* passengersOff, QPush
     // Only move the elevator if it is not currently in motion
     if (elevator->m_direction == "Stopped") {
         elevator->move(to_floor);
-        communicate_doors(passengersOn, passengersOff, confirmButton, cab, elevator_index, to_floor);
+        if (to_floor == elevator->m_floor_number){
+            communicate_doors(passengersOn, passengersOff, confirmButton, cab, elevator_index, to_floor);
+        }
 
 
     }
