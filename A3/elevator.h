@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QTextBrowser>
+#include <QTimer>
+#include <QThread>
 #include "floor.h"
 
 class Elevator : public QObject
@@ -13,6 +15,7 @@ public:
     QString m_direction;
     bool m_idle;
     int m_floor_number;
+    QTextBrowser *m_browser;
 
 public slots:
     void ring();
@@ -23,14 +26,19 @@ public slots:
     void open_cab();
     void close_cab();
 
-
+signals:
+    void stopped();
 
 private:
-    QTextBrowser *m_browser;
+
     int m_elevator_id;
     //number of passengeres that are in the elevator
     int m_passengers;
+    QTimer *ele_timer;
+    QThread *ele_thread;
 
+signals:
+    void destination_reached();
 
 };
 

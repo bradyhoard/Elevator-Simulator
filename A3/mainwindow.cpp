@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //all the elevators added to the ECS
     Elevator* elevator1 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 1, this);
-    Elevator* elevator2 = new Elevator(ui->textBrowser, false , "Stopped", 0 ,0, 2, this);
+    Elevator* elevator2 = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, 2, this);
     elevators->push_back(elevator1);
     elevators->push_back(elevator2);
 
@@ -60,12 +60,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->floorUp, &QPushButton::clicked, this, [=]() {
             int floor_number = ui->floorComboBox->currentText().toInt();
-            ecs->find_elevator(ui->passengers_on , ui->passengers_off ,ui->PassengersConfirm , floor_number , "Up");
+            ecs->find_elevator(ui->passengers_on , ui->passengers_off ,ui->PassengersConfirm , ui->passengers_cab,  floor_number , "Up");
         });
 
     connect(ui->floorDown, &QPushButton::clicked, this, [=]() {
             int floor_number = ui->floorComboBox->currentText().toInt();
-            ecs->find_elevator(ui->passengers_on , ui->passengers_off ,ui->PassengersConfirm ,floor_number , "Down");
+            ecs->find_elevator(ui->passengers_on , ui->passengers_off ,ui->PassengersConfirm , ui->passengers_cab , floor_number , "Down");
         });
 
 
@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->GoButton, &QPushButton::clicked, this, [=]() {
             int cab = ui->carComboBox->currentText().toInt() -1;
             int floor = ui->carFloorComboBox->currentText().toInt();
-            ecs->move_elevator(ui->passengers_on , ui->passengers_off , ui->PassengersConfirm , cab , floor);
+            ecs->move_elevator(ui->passengers_on , ui->passengers_off , ui->PassengersConfirm ,ui->passengers_cab , cab , floor);
         });
 
     connect(ui->ElevatorStatusButton, &QPushButton::clicked, this, [=]() {
@@ -87,22 +87,23 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->FireButton, &QPushButton::clicked, this, [=]() {
             QString em = "fire!";
-            ecs->emergency(em);
+            ecs->emergency(em , ui->PassengersConfirm);
         });
 
     connect(ui->PowerOutageButton, &QPushButton::clicked, this, [=]() {
             QString em = "power outage!";
-            ecs->emergency(em);
+            ecs->emergency(em, ui->PassengersConfirm);
         });
 
     connect(ui->DoorObstaclesButton, &QPushButton::clicked, this, [=]() {
-            QString em = "door obstacle!";
-            ecs->emergency(em);
+            QString em = "door obstacles!";
+            int cab = ui->carComboBox->currentText().toInt() -1;
+            ecs->emergency(em, ui->PassengersConfirm , cab);
         });
 
     connect(ui->OverLoadButton, &QPushButton::clicked, this, [=]() {
             QString em = "overload!";
-            ecs->emergency(em);
+            ecs->emergency(em, ui->PassengersConfirm);
         });
 
     connect(ui->HelpButton, &QPushButton::clicked, this, [=]() {

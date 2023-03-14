@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QPushButton>
+#include <QEventLoop>
 
 ECS::ECS(QTextBrowser *browser, QList<Elevator*> *elevators, QList<Floor*> floors,  QObject *parent) : QObject(parent)
 {
@@ -16,49 +17,55 @@ void ECS::help(const int index)
 {
     m_browser->append("Received help signal from elevator:   " + QString::number(index));
     m_elevators.at(index-1)->voice_connection();
+
+    QTimer::singleShot(5000, [=]() {
+        m_browser->append("There has not been a response in 5 seconds 911 has been placed");
+    });
+
 }
 
 
-void ECS::emergency(const QString& em , int index)
+void ECS::emergency(const QString& em , QPushButton *confirmButton, int index)
 {
-    m_browser->append("Alert , there is a: " + em);
-
-
-    //in all scenarios , the safe floor is 2
-    m_browser->append("Moving all elevators to Floor 2");
+    m_browser->append("Alert , there is a: " + em + "(this is a text and audio message");
 
 
     if (em == "door obstacles!"){
-        m_browser->append("door obstacles");
+        m_browser->append("Light sensor has been interrupted when closing");
+        m_elevators.at(index+1)->m_direction = "Stopped";
+        m_elevators.at(index+1)->open_cab();
+
     }
     else if (em == "fire!"){
-        m_browser->append("fire");
+        //in all scenarios , the safe floor is 2
+        m_browser->append("Moving all elevators to Floor 2");
+        for (int i = 0; i < m_elevators.count(); ++i) {
+            m_elevators[i]->move(2);
+            m_elevators[i]->open_cab();
+            m_floors[1]->open_Door();
+        }
     }
     else if (em == "overload!"){
          m_browser->append("On elevator : " + QString::number(index +1));
+         m_elevators.at(index+1)->m_direction = "Stopped";
+         m_browser->append("Please remove the carrying capacity (this is a text and audio message)");
+         communicate_doors(index , confirmButton , 2);
 
     }
     else {
-        m_browser->append("power out");
+        //in all scenarios , the safe floor is 2
+        m_browser->append("Moving all elevators to Floor 2");
+        m_browser->append("There is a power outage (this is a text and audio message)");
+        for (int i = 0; i < m_elevators.count(); ++i) {
+            m_elevators[i]->move(2);
+            m_elevators[i]->open_cab();
+            m_floors[1]->open_Door();
+        }
+
     }
-/*
-    Elevator *elevator1 = m_elevators.at(0);
-    Elevator *elevator2 = m_elevators.at(1);
-    Elevator *elevator3 = m_elevators.at(2);
-    Elevator *elevator4 = m_elevators.at(3);
-
-    elevator1->move(1);
-    elevator2->move(1);
-    elevator3->move(1);
-    elevator4->move(1);
-
-    Floor *floor0 = m_floors.at(0);
-    floor0->open_Door();
-*/
-
 }
 
-void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int floor , const QString direction){
+void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton ,  QComboBox *cab , const int floor , const QString direction){
 
     m_browser->append("Floor number: " + QString::number(floor) + " | Requested to go : " + direction);
     bool found_elevator = false;
@@ -71,7 +78,7 @@ void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPus
        if(m_elevators.at(i)->m_idle)
        {
            m_browser->append("Allocation_strategyA has been activated | found an elevator that is idle");
-           allocation_strategyA(passengersOn , passengersOff ,confirmButton ,i, floor);
+           allocation_strategyA(passengersOn , passengersOff ,confirmButton , cab, i, floor);
            found_elevator = true;
            break;
        }
@@ -86,7 +93,7 @@ void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPus
 
         for(int i = 0; i < m_elevators.size(); i++)
         {
-           if((m_elevators.at(i)->m_direction == direction && direction =="Up" && m_elevators.at(i)->m_floor_number < floor)|| (m_elevators.at(i)->m_direction == direction && direction =="Down" && m_elevators.at(i)->m_floor_number > floor));
+           if((m_elevators.at(i)->m_direction == direction && direction =="Up" && m_elevators.at(i)->m_floor_number < floor)|| (m_elevators.at(i)->m_direction == direction && direction =="Down" && m_elevators.at(i)->m_floor_number > floor))
            {
                m_browser->append("Allocation_strategyB has been activated | found an elevator that is going in the same direciton and approaching the desired floor");
                m_elevators.at(i)->m_direction = "Stopped";
@@ -96,7 +103,7 @@ void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPus
                timeWait->setInterval(2500);
 
                connect(timeWait, &QTimer::timeout, this, [=]() {
-                   allocation_strategyB(passengersOn , passengersOff ,confirmButton , i, floor);
+                   allocation_strategyB(passengersOn , passengersOff ,confirmButton , cab, i, floor);
                    timeWait->stop();
 
                });
@@ -111,13 +118,22 @@ void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPus
 }
 
 
-void ECS::move_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int elevator_index, const int to_floor){
-    m_elevators.at(elevator_index)->move(to_floor);
-    communiate_doors(passengersOn , passengersOff  ,confirmButton , elevator_index , to_floor);
+void ECS::move_elevator(QComboBox* passengersOn, QComboBox* passengersOff, QPushButton* confirmButton,  QComboBox *cab , const int elevator_index, const int to_floor) {
+    Elevator* elevator = m_elevators.at(elevator_index);
+
+    // Only move the elevator if it is not currently in motion
+    if (elevator->m_direction == "Stopped") {
+        // Move the elevator and wait for it to arrive at the target floor before proceeding
+        connect(elevator, &Elevator::destination_reached, [=]() {
+            communicate_doors(passengersOn, passengersOff, confirmButton, cab, elevator_index, to_floor);
+        });
+
+        elevator->move(to_floor);
+    }
 }
 
 
-void ECS::communiate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int index , const int floor){
+void ECS::communicate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton ,  QComboBox *cab , const int index , const int floor){
     if (m_elevators.at(index)->m_direction == "Stopped"){
          m_elevators.at(index)->open_cab();
          m_floors.at(floor)->open_Door();
@@ -127,9 +143,10 @@ void ECS::communiate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,Q
          connect(confirmButton, &QPushButton::clicked, this, [=]() {
                  int on = passengersOn->currentText().toInt();
                  int off = passengersOff->currentText().toInt();
-                 if (m_elevators.at(index)->change_passengers(on , off)){
+                 int cab_number = cab->currentText().toInt() -1;
+                 if (m_elevators.at(cab_number)->change_passengers(on , off)){
                      QString em = "overload!";
-                     emergency(em , index);
+                     emergency(em , confirmButton,index);
                  }
              });
 
@@ -153,17 +170,47 @@ void ECS::communiate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,Q
 
 }
 
-void ECS::allocation_strategyA(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int index , const int floor){
+void ECS::communicate_doors(const int index , QPushButton *confirmButton, const int floor){
 
-    m_elevators.at(index)->move(floor);
-    communiate_doors(passengersOn , passengersOff  ,confirmButton , index , floor);
+         m_elevators.at(index)->open_cab();
+         m_floors.at(floor)->open_Door();
+         confirmButton->setEnabled(true);
+         confirmButton->setText("Fix");
+
+
+         connect(confirmButton, &QPushButton::clicked, this, [=]() {
+             m_browser->append("Overload Error Fixed");
+                 confirmButton->setText("Confirm");
+                 m_elevators.at(index)->ring();
+                 m_elevators.at(index)->close_cab();
+                 m_floors.at(floor)->close_Door();
+                 confirmButton->setEnabled(false);
+             });
+
+}
+
+void ECS::allocation_strategyA(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton ,  QComboBox *cab , const int index , const int floor){
+    Elevator* elevator = m_elevators.at(index);
+
+    connect(elevator, &Elevator::destination_reached, [=]() {
+        communicate_doors(passengersOn, passengersOff, confirmButton, cab, index, floor);
+    });
+
+    elevator->move(floor);
+
+
 
 
 }
 
-void ECS::allocation_strategyB(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton , const int index ,const int floor){
-    m_elevators.at(index)->move(floor);
-    communiate_doors(passengersOn , passengersOff  , confirmButton , index , floor);
+void ECS::allocation_strategyB(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton ,  QComboBox *cab , const int index ,const int floor){
+    Elevator* elevator = m_elevators.at(index);
+
+    connect(elevator, &Elevator::destination_reached, [=]() {
+        communicate_doors(passengersOn, passengersOff, confirmButton, cab, index, floor);
+    });
+
+    elevator->move(floor);
 
 
 

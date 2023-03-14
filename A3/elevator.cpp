@@ -2,6 +2,8 @@
 #include "floor.h"
 #include <QTimer>
 #include <QEventLoop>
+#include <QMutex>
+#include <QTextEdit>
 
 Elevator::Elevator(QTextBrowser *browser, bool idle, QString direction, int floor_number,int passengers, int elevator_id , QObject *parent) : QObject(parent)
 {
@@ -11,6 +13,7 @@ Elevator::Elevator(QTextBrowser *browser, bool idle, QString direction, int floo
     m_floor_number = floor_number;
     m_elevator_id = elevator_id;
     m_passengers = passengers;
+    ele_timer = new QTimer(nullptr);
 
 }
 
@@ -30,90 +33,72 @@ void Elevator::ring()
 {
     m_direction = "Stopped";
     m_browser->append("Elevator ringing!");
+    emit destination_reached();
 }
 
-void Elevator::move(const int to_Floor)
-{
+void Elevator::move(int to_Floor) {
     m_browser->append("Elevator: " + QString::number(m_elevator_id) + " - ");
-    m_browser->insertPlainText("At floor: " + QString::number(m_floor_number) + " || To floor: " + QString::number(to_Floor));
+       m_browser->insertPlainText("At floor: " + QString::number(m_floor_number) + " || To floor: " + QString::number(to_Floor));
 
-    if (m_floor_number < to_Floor){
-        m_direction = "Up";
-        m_idle = false;
-        QTimer *timer = new QTimer(this);
-            timer->setInterval(2000);
-            QObject::connect(timer, &QTimer::timeout, [=]() {
-                m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving up to: ");
-                m_browser->insertPlainText(QString::number(m_floor_number));
-                m_floor_number++;
-                if (m_floor_number > to_Floor) {
-                    m_floor_number--;
-                    timer->stop();
-                    timer->deleteLater();
-                    ring();
-                }
-                else if (m_direction == "Stopped"){
-                    m_browser->append("Elevator has been stopped");
-                    timer->stop();
-                    timer->deleteLater();
+       if (m_floor_number < to_Floor){
+           m_direction = "Up";
+           m_idle = false;
+               ele_timer = new QTimer(this);
+               ele_timer->setInterval(2000);
+               QObject::connect(ele_timer, &QTimer::timeout, [=]() {
+                   m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving up to: ");
+                   m_browser->insertPlainText(QString::number(m_floor_number));
+                   m_floor_number++;
+                   if (m_floor_number > to_Floor) {
+                       m_floor_number--;
+                       ele_timer->stop();
+                       ring();
+                   }
+                   else if (m_direction == "Stopped"){
+                       m_browser->append("Elevator has been stopped");
+                       ele_timer->stop();
 
-                }
-            });
-            for(int i = m_floor_number + 1; i <= to_Floor; i++)
-            {
-                m_floor_number = i;
-                timer->start();
-                QEventLoop loop;
-                QObject::connect(timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-                loop.exec();
-            }
-    }
-    else if (m_floor_number > to_Floor){
-        m_direction = "Down";
-        m_idle = false;
-        QTimer *timer = new QTimer(this);
-            timer->setInterval(1000);
-            QObject::connect(timer, &QTimer::timeout, [=]() {
-                m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving down to: ");
-                m_browser->insertPlainText(QString::number(m_floor_number));
-                m_floor_number--;
-                if (m_floor_number < to_Floor) {
-                    m_floor_number++;
-                    timer->stop();
-                    timer->deleteLater();
-                    ring();
-                }
-            });
-            for(int i = m_floor_number - 1; i >= to_Floor; i--)
-            {
-                m_floor_number = i;
-                timer->start();
-                QEventLoop loop;
-                QObject::connect(timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-                loop.exec();
-            }
+                   }
+               });
+               for(int i = m_floor_number + 1; i <= to_Floor; i++)
+               {
+                   m_floor_number = i;
+                   ele_timer->start();
+                   QEventLoop loop;
+                   QObject::connect(ele_timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+                   loop.exec();
+               }
+       }
+       else if (m_floor_number > to_Floor){
+           m_direction = "Down";
+           m_idle = false;
+               ele_timer->setInterval(1000);
+               QObject::connect(ele_timer, &QTimer::timeout, [=]() {
+                   m_browser->append("Elevator(" + QString::number(m_elevator_id) + ") - moving down to: ");
+                   m_browser->insertPlainText(QString::number(m_floor_number));
+                   m_floor_number--;
+                   if (m_floor_number < to_Floor) {
+                       m_floor_number++;
+                       ele_timer->stop();
+                       ring();
+                   }
+               });
+               for(int i = m_floor_number - 1; i >= to_Floor; i--)
+               {
+                   m_floor_number = i;
+                   ele_timer->start();
+                   QEventLoop loop;
+                   QObject::connect(ele_timer, &QTimer::timeout, &loop, &QEventLoop::quit);
+                   loop.exec();
+               }
 
-        }
+           }
 
-    else{
-         m_browser->append("Currently at the request Floor");
-         ring();
-    }
-
-
-
-/*
-    //current floor of the elevator and change to the new floor
-    QString cur = QString::number(m_floor);
-    m_browser->append(cur);
-    m_floor = to_Floor;
-    QString cur2 = QString::number(m_floor);
-    m_browser->append(cur2);
-*/
-
-
+       else{
+            m_browser->append("Currently at the request Floor");
+            ring();
+       }
 }
-
 
 void Elevator::voice_connection()
 {
