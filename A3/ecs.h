@@ -10,6 +10,7 @@
 #include <QtWidgets>
 #include "elevator.h"
 #include "floor.h"
+#include "button.h"
 
 class ECS : public QObject
 {
@@ -18,7 +19,7 @@ public:
     explicit ECS(QTextBrowser *browser, QList<Elevator*> *elevators, QList<Floor*> floors ,  QObject *parent = nullptr);
 
 public slots:
-     void help(const int index);
+    void help(const int index);
     void emergency(const QString& em , QPushButton *cofirmButton, int elevator_index =0);
     void find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *cofirmButton , QComboBox *cab , const int floor , const QString direction);
     void move_elevator(QComboBox *passengersOn , QComboBox *passengersOff , QPushButton *cofirmButton ,  QComboBox *cab , const int elevator_index, const int to_floor);
@@ -31,8 +32,7 @@ private:
     QTextBrowser *m_browser;
     QList<Elevator*> m_elevators;
     QList<Floor*> m_floors;
-    QList<QFuture<void>> m_futures;
-    QList<QFutureWatcher<void>> m_future_watchers;
+    Button *button;
 };
 
 #endif // ECS_H

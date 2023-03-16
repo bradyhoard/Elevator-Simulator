@@ -6,13 +6,24 @@ Button::Button(QTextBrowser *browser, QObject *parent) : QObject(parent)
     m_browser = browser;
 }
 
-void Button::illuminate()
+void Button::illuminate(const int index , const QString location , const int ifcab_floor)
 {
-    m_browser->append("Button illuminated!");
+    if (location == "Floor"){
+        m_browser->append("Floor (" + QString::number(index) + ") - button illuminated!");
+    }
+    else{
+         m_browser->append("Cab (" + QString::number(index + 1) + ") to floor (" + QString::number(ifcab_floor) + ") - button illuminated!");
+    }
+
 }
 
-void Button::deilluminate()
+void Button::deilluminate(const int index , const QString location, const int ifcab_floor)
 {
-    m_browser->append("Button deilluminated!");
+    if (location == "Floor"){
+        m_browser->append("Floor (" + QString::number(index) + ") - button de-illuminated!");
+    }
+    else{
+         m_browser->append("Cab (" + QString::number(index + 1) + ") to floor (" + QString::number(ifcab_floor) + ") - button de-illuminated!");
+    }
 }
 

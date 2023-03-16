@@ -76,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent)
           Elevator* elevator = new Elevator(ui->textBrowser, true , "Stopped", 0 ,0, i, this);
           elevators->push_back(elevator);
       }
+       ui->textBrowser->append("-----------------------------");
 
         ecs = new ECS(ui->textBrowser, elevators, *floors, this);
 
@@ -85,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
         ui->PowerOutageButton->setEnabled(true);
         ui->FireButton->setEnabled(true);
         ui->DoorObstaclesButton->setEnabled(true);
-        ui->OverLoadButton->setEnabled(true);
+        //ui->OverLoadButton->setEnabled(true);
         ui->HelpButton->setEnabled(true);
         ui->GoButton->setEnabled(true);
         ui->floorUp->setEnabled(true);
@@ -140,7 +141,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->DoorObstaclesButton, &QPushButton::clicked, this, [=]() {
             QString em = "door obstacles!";
-            int cab = ui->carComboBox->currentText().toInt() -1;
+            int cab = ui->carComboBox->currentText().toInt();
             ecs->emergency(em, ui->PassengersConfirm , cab);
         });
 

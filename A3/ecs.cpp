@@ -10,6 +10,7 @@ ECS::ECS(QTextBrowser *browser, QList<Elevator*> *elevators, QList<Floor*> floor
     m_browser = browser;
     m_elevators = *elevators;
     m_floors = floors;
+    button = new Button(browser);
 
 
 }
@@ -28,13 +29,13 @@ void ECS::help(const int index)
 
 void ECS::emergency(const QString& em , QPushButton *confirmButton, int index)
 {
-    m_browser->append("Alert , there is a: " + em + "(this is a text and audio message");
+    m_browser->append("Alert , there is a: " + em + " (this is a text and audio message)");
 
 
     if (em == "door obstacles!"){
         m_browser->append("Light sensor has been interrupted when closing");
-        m_elevators.at(index+1)->m_direction = "Stopped";
-        m_elevators.at(index+1)->open_cab();
+        m_elevators.at(index-1)->m_direction = "Stopped";
+        m_elevators.at(index-1)->open_cab();
 
     }
     else if (em == "fire!"){
@@ -47,7 +48,7 @@ void ECS::emergency(const QString& em , QPushButton *confirmButton, int index)
         }
     }
     else if (em == "overload!"){
-         m_browser->append("On elevator : " + QString::number(index +1));
+         m_browser->append("On elevator : " + QString::number(index+1));
          m_elevators.at(index+1)->m_direction = "Stopped";
          m_browser->append("Please remove the carrying capacity (this is a text and audio message)");
          communicate_doors(index , confirmButton , 2);
@@ -67,6 +68,7 @@ void ECS::emergency(const QString& em , QPushButton *confirmButton, int index)
 }
 
 void ECS::find_elevator(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton ,  QComboBox *cab , const int floor , const QString direction){
+    button->illuminate(floor , "Floor");
 
     m_browser->append("Floor number: " + QString::number(floor) + " | Requested to go : " + direction);
     bool found_elevator = false;
@@ -122,8 +124,10 @@ void ECS::move_elevator(QComboBox* passengersOn, QComboBox* passengersOff, QPush
 
     // Only move the elevator if it is not currently in motion
     if (elevator->m_direction == "Stopped") {
+        button->illuminate(elevator_index , "Elevator" , to_floor);
         elevator->move(to_floor);
         if (to_floor == elevator->m_floor_number){
+            button->deilluminate(elevator_index , "Elevator" ,  to_floor);
             communicate_doors(passengersOn, passengersOff, confirmButton, cab, elevator_index, to_floor);
         }
 
@@ -143,8 +147,8 @@ void ECS::communicate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,
          connect(confirmButton, &QPushButton::clicked, this, [=]() {
                  int on = passengersOn->currentText().toInt();
                  int off = passengersOff->currentText().toInt();
-                 int cab_number = cab->currentText().toInt() -1;
-                 if (m_elevators.at(cab_number)->change_passengers(on , off)){
+                 int cab_number = cab->currentText().toInt();
+                 if (m_elevators.at(cab_number-1)->change_passengers(on , off)){
                      QString em = "overload!";
                      emergency(em , confirmButton,index);
                  }
@@ -186,6 +190,7 @@ void ECS::communicate_doors(const int index , QPushButton *confirmButton, const 
 void ECS::allocation_strategy_move(QComboBox *passengersOn , QComboBox *passengersOff ,QPushButton *confirmButton ,  QComboBox *cab , const int index ,const int floor){
     Elevator* elevator = m_elevators.at(index);
     elevator->move(floor);
+    button->deilluminate(floor , "Floor");
     communicate_doors(passengersOn, passengersOff, confirmButton, cab, index, floor);
 }
 

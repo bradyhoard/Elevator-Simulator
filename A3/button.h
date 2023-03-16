@@ -11,8 +11,8 @@ public:
     explicit Button(QTextBrowser *browser, QObject *parent = nullptr);
 
 public slots:
-    void illuminate();
-    void deilluminate();
+    void illuminate(const int index , const QString location , const int ifcab_floor = 0);
+    void deilluminate(const int index , const QString location , const int ifcab_floor = 0);
 
 private:
     QTextBrowser *m_browser;
