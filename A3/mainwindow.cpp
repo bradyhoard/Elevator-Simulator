@@ -167,6 +167,18 @@ MainWindow::MainWindow(QWidget *parent)
             ecs->help(cab);
         });
 
+    //these are for testing purposes only
+
+    /*
+    connect(ui->allocStrat2, &QPushButton::clicked, this, [=]() {
+            QList<Elevator*> elevators = ecs->get_elevators();
+            Elevator* elevator = elevators[1];
+            elevator->m_direction = "Down"; //thus the elevator will always be moving
+            elevator->m_idle = false;
+            ui->textBrowser->append("Elevator 2's direction has been set to 'Down' and is not idle thus it will not block the text browser with the its statements (used for allocation strat 2) ");
+        });
+    */
+
 }
 
 

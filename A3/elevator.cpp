@@ -220,7 +220,7 @@ void Elevator::open_cab()
  *      bool , true if overload , false if not
  *
  */
-bool Elevator::change_passengers(int on , int off)
+void Elevator::change_passengers(int on , int off)
 {
     m_browser->append("Passengers getting on: " + QString::number(on));
     m_browser->append("Passengers getting off: " + QString::number(off));
@@ -231,18 +231,11 @@ bool Elevator::change_passengers(int on , int off)
         m_passengers = 0;
     }
     m_passengers += on;
-    //assume the overload capacity is 6 people
-    if (m_passengers >= 6){
-        return true;
-    }
     //the elevator becomes idle if there is nobody on the elevator and therefore , will become the next available elevator in the allocation strategy
-    else if (m_passengers == 0){
+    if (m_passengers == 0){
         m_idle = true;
-        return false;
     }
-    else{
-        return false;
-    }
+
 }
 
 /*

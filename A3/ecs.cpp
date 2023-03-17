@@ -85,6 +85,7 @@ void ECS::emergency(const QString& em , QPushButton *confirmButton, int index)
     }
     //handle the power outage emergecny
     else {
+        m_browser->append("Running off the battery backup");
         m_browser->append("Moving all elevators to Floor 2");
         for (int i = 0; i < m_elevators.count(); ++i) {
             m_elevators[i]->move(2);
@@ -201,7 +202,7 @@ void ECS::move_elevator(QComboBox* passengersOn, QComboBox* passengersOff, QPush
 
 
     // Only move the elevator if it is not currently in motion
-    if (elevator->m_direction == "Stopped") {
+    if (elevator->m_idle) {
         button->illuminate(elevator_index , "Elevator" , to_floor);
         elevator->move(to_floor);
         //once it reaches the requested floor
@@ -247,18 +248,20 @@ void ECS::communicate_doors(QComboBox *passengersOn , QComboBox *passengersOff ,
      confirmButton->setEnabled(true);
 
      //connect function for when the confirm button is clicked
+     disconnect(confirmButton, &QPushButton::clicked, this, nullptr);
      connect(confirmButton, &QPushButton::clicked, this, [=]() {
          //all this does is add passegners to the cab number indicated , if change_passengers returns true , there is an overload emergency
          int on = passengersOn->currentText().toInt();
          int off = passengersOff->currentText().toInt();
          int cab_number = cab->currentText().toInt();
-         if (m_elevators.at(cab_number-1)->change_passengers(on , off)){
+         m_elevators.at(cab_number-1)->change_passengers(on , off);
+         if (m_elevators.at(cab_number-1)->m_passengers >=6){
              QString em = "overload!";
              emergency(em , confirmButton,index);
          }
      });
 
-     //after 10 seconds of the doors opening , ring again , and close both floor and cab doors
+     //after 10 seconds (put to 4 seconds for testing) of the doors opening , ring again , and close both floor and cab doors
      QTimer::singleShot(10000, [=]() {
          m_elevators.at(index)->ring();
          m_elevators.at(index)->close_cab();
@@ -307,13 +310,10 @@ void ECS::communicate_doors(const int index , QPushButton *confirmButton, const 
 
 
          //once clicked the program will return to its normal state
+         disconnect(confirmButton, &QPushButton::clicked, this, nullptr);
          connect(confirmButton, &QPushButton::clicked, this, [=]() {
              m_browser->append("Overload Error Fixed");
                  confirmButton->setText("Confirm");
-                 m_elevators.at(index)->ring();
-                 m_elevators.at(index)->close_cab();
-                 m_floors.at(floor)->close_Door();
-                 confirmButton->setEnabled(false);
              });
 
 }
