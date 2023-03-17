@@ -17,10 +17,12 @@ public:
     int m_floor_number;
     QQueue<int> m_floors_queue;
     QTextBrowser *m_browser;
+    //number of passengeres that are in the elevator
+    int m_passengers;
 
 public slots:
     void ring();
-    bool change_passengers(int passengers_on , int passengers_off);
+    void change_passengers(int passengers_on , int passengers_off);
     void voice_connection();
     void status();
     void move( const int to_Floor);
@@ -31,8 +33,6 @@ public slots:
 private:
 
     int m_elevator_id;
-    //number of passengeres that are in the elevator
-    int m_passengers;
     QTimer *ele_timer;
 
 
