@@ -29,7 +29,7 @@ Forms
 
 Running instructions: 
 
-Once open in QT creator , all files are imported correclty and able to run the project 
+Once open in QT creator , all files are imported correclty , build the qmake project from the menu , and you will be able to run the project 
 
 Click Green arrow on left side of the screen (Run) 
 	
