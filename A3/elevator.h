@@ -4,17 +4,18 @@
 #include <QObject>
 #include <QTextBrowser>
 #include <QTimer>
-#include <QThread>
+#include <QQueue>
 #include "floor.h"
 
 class Elevator : public QObject
 {
     Q_OBJECT
 public:
-    explicit Elevator(QTextBrowser *browser, bool idle, QString m_direction, int floor_number,  int m_passengers, int elevator_id , QObject *parent = nullptr);
+    explicit Elevator(QTextBrowser *browser, bool idle, QString m_direction, int floor_number,  int m_passengers, int elevator_id , QQueue<int> floors_queue , QObject *parent = nullptr);
     QString m_direction;
     bool m_idle;
     int m_floor_number;
+    QQueue<int> m_floors_queue;
     QTextBrowser *m_browser;
 
 public slots:
