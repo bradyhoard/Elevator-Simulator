@@ -1,1 +1,35 @@
-read me , for the notes of the A3
+Name : Braydon Hoard
+ID: 101144599 
+Course: COMP3004 - OOSD
+Assignemnt: #3 Elevator System Simulator in Qt C++
+--------
+
+Files : 
+
+A3.pro
+
+ Headers
+	button.h
+	ecs.h
+	elevator.h
+	floor.h
+	mainwindow.h
+
+Sources
+	button.cpp
+	ecs.cpp
+	elevator.cpp
+	floor.cpp
+	main.cpp
+	mainwindow.cpp
+
+Forms
+	mainwindow.ui
+
+
+Running instructions: 
+
+Once open in QT creator , all files are imported correclty and able to run the project 
+
+Click Green arrow on left side of the screen (Run) 
+	
